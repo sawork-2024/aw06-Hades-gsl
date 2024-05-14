@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: webpos-api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: product-server
+          uri: lb://webpos-product-server
+          predicates:
+            - Path=/product/**
+          filters:
+            - name: SpecialHystrix
+              args:
+                failbackUri: forward:/fallback-product
+        - id: order-server
+          uri: lb://webpos-order-server
+          predicates:
+            - Path=/order/**
+          filters:
+            - name: SpecialHystrix
+              args:
+                failbackUri: forward:/fallback-order
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
